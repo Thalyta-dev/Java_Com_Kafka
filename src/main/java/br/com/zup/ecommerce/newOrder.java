@@ -9,14 +9,18 @@ import org.apache.kafka.common.serialization.StringSerializer;
 
 
 import java.util.Properties;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 public class newOrder {
 
     public static void main(String[] args) throws ExecutionException, InterruptedException {
         var producer = new KafkaProducer<String,String>(properties());
-        var value = "22,54,97";
-        var record = new ProducerRecord<String, String>("ECOMMERCE_NEW_ORDER",value,value);
+        var key = UUID.randomUUID().toString();
+
+        var value =key + "22,54,97";
+
+        var record = new ProducerRecord<String, String>("ECOMMERCE_NEW_ORDER",key,value);
         Callback callback = (recordMetadata, e) ->{
             if(e != null){
 
@@ -27,7 +31,7 @@ public class newOrder {
             System.out.println("Sucesso enviado " + recordMetadata.topic() + " Particao " + recordMetadata.partition() + " offiset " + recordMetadata.offset() );
         };
 
-        var emailRecord = new ProducerRecord<>("ECOMMERCE_SEND_EMAIL", value, value);
+        var emailRecord = new ProducerRecord<>("ECOMMERCE_SEND_EMAIL", key, value);
 
         var email = "Olá, sou o novo email";
         producer.send(record,callback).get();
